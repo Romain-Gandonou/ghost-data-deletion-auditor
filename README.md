@@ -1,16 +1,17 @@
-# Ghost Data Still Exists — deletion audit agent
+# Ghost Data Still Exists — auditeur de suppression
 
-This repository contains a deterministic Python baseline for the HackerRank
-Orchestrate "Ghost Data Still Exists" deletion-audit challenge. The challenge
-dataset and generated predictions are intentionally not included.
+Ce dépôt contient une solution Python déterministe de base pour le défi
+HackerRank Orchestrate « Ghost Data Still Exists ». Le jeu de données du défi
+et les prédictions générées ne sont volontairement pas inclus.
 
-## Get the participant dataset
+## Récupérer le jeu de données participant
 
-Obtain the participant-facing dataset from the official challenge repository:
+Récupérez les fichiers accessibles aux participants depuis le dépôt officiel
+du défi :
 
 <https://github.com/interviewstreet/hackerrank-orchestrate-october26>
 
-Place its `dataset/` folder beside this repository's `code/` directory:
+Placez le dossier `dataset/` à la racine de ce dépôt, à côté de `code/` :
 
 ```text
 ghost-data-deletion-auditor/
@@ -18,47 +19,50 @@ ghost-data-deletion-auditor/
 └── code/
 ```
 
-Do not copy organizer-only data, private answer keys, credentials, or any
-other restricted material.
+Ne copiez pas de données réservées aux organisateurs, de réponses privées,
+d’identifiants de connexion ni aucun autre contenu soumis à restriction.
 
-## Run
+## Exécuter le programme
 
-Use Python 3.10 or newer:
+Python 3.10 ou une version ultérieure est nécessaire :
 
 ```bash
 python3 code/main.py
 python3 code/evaluation/main.py
 ```
 
-The program uses only the Python standard library. It writes `output.csv` at
-the repository root. PDF text extraction uses the local `pdftotext` command
-when available. Tesseract is optional; if it is not installed, PNG evidence
-is skipped with an explicit warning.
+Le programme n’utilise que la bibliothèque standard de Python et écrit
+`output.csv` à la racine du dépôt. Si la commande locale `pdftotext` est
+disponible, elle sert à extraire le texte des PDF. Tesseract est facultatif ;
+en son absence, les preuves contenues dans les images PNG sont ignorées et un
+avertissement est affiché.
 
-## Approach
+## Approche
 
-The pipeline resolves current and historical identifiers, follows identity
-links in system activity, parses JSON, text, PDF, and SQLite-compatible SQL
-evidence, and filters observations by each request's `audit_at`. It applies
-the provided deletion rules to evidence grouped by system and resource, then
-serializes ordered findings, remediation actions, and verification steps.
-Non-deletion requests produce `NOT_APPLICABLE` with an empty steps array.
+Le pipeline reconstitue les identifiants actuels et historiques, suit les
+liens d’identité présents dans l’activité système, analyse les preuves JSON,
+texte, PDF et SQL compatibles avec SQLite, puis filtre les observations selon
+la date `audit_at` de chaque demande. Il applique les règles de suppression
+aux preuves regroupées par système et ressource, puis produit les constats,
+les actions correctives et les vérifications dans l’ordre requis. Une demande
+qui n’autorise pas la suppression reçoit le statut `NOT_APPLICABLE` et une
+liste d’étapes vide.
 
-The evaluation script checks the output schema and structure, compares
-results with the participant-facing public examples, and runs synthetic
-tests. Public examples are used for evaluation only, not to generate
-predictions.
+Le script d’évaluation vérifie le schéma et la structure du résultat, compare
+les prédictions aux exemples publics fournis aux participants et exécute des
+tests synthétiques. Les exemples publics servent uniquement à l’évaluation ;
+ils ne sont pas utilisés pour produire les prédictions.
 
-## Evaluation and limitations
+## Évaluation et limites
 
-On the 32 public examples, the recorded status accuracy is 65.6%; exact
-status-and-sequence accuracy is 9.4%. These results indicate that the
-solution is an experimental baseline, not a reliable production deletion
-auditor. Known limitations include heuristic resource classification and
-skipped screenshots when Tesseract is unavailable. See
-[`code/evaluation/evaluation_report.md`](code/evaluation/evaluation_report.md)
-for results and
-[`code/evaluation/usage_report.md`](code/evaluation/usage_report.md) for
-runtime usage.
+Sur les 32 exemples publics, l’exactitude mesurée des statuts est de **65,6 %**
+et l’exactitude des cas entièrement corrects — statut et séquence d’étapes — est
+de **9,4 %**. Ces résultats montrent qu’il s’agit d’une base expérimentale,
+et non d’un auditeur de suppression fiable pour un usage en production. Parmi
+les limites connues : la classification heuristique des ressources et les
+captures d’écran ignorées lorsque Tesseract n’est pas installé. Consultez le
+[rapport d’évaluation](code/evaluation/evaluation_report.md) pour les détails
+et le [rapport d’utilisation](code/evaluation/usage_report.md) pour les
+informations d’exécution.
 
-No model API is called when running the program.
+À l’exécution, le programme ne fait appel à aucune API de modèle.
